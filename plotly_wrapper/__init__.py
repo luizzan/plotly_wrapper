@@ -7,6 +7,9 @@ import numpy as np
 import requests
 from PIL import Image
 
+from version import version
+__version__ = version
+
 # Import plotly settings from file
 USERNAME, API_KEY, COLORS = '', '', []
 FOOTER, FOOTER_LEFT, FOOTER_RIGHT = '', '', ''
