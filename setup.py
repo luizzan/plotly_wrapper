@@ -1,4 +1,4 @@
-from setuptools import 
+from setuptools import setup
 from plotly_wrapper.version import version
 
 setup(
