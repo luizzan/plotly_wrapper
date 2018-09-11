@@ -6,4 +6,9 @@ setup(
     author='Luiz Zanini',
     author_email='plotly_wrapper@luizzanini.com',
     packages=['plotly_wrapper'],
+    install_requires = [
+    	'numpy',
+        'plotly',
+        'Pillow',
+    ],
 )
