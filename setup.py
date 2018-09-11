@@ -5,5 +5,5 @@ setup(
     url='https://github.com/luizzan/plotly_wrapper',
     author='Luiz Zanini',
     author_email='plotly_wrapper@luizzanini.com',
-    packages=['__init__'],
+    packages=['plotly_wrapper'],
 )
