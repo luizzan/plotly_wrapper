@@ -7,12 +7,11 @@ Run `pip3 install wheel` outside the virtualenv.
 
 # Requirements
 
-To automatically sign in to Plotly (to save png files) and/or configure colors:
+Saving images as PNG files is only available if signed in to Plotly. To automatically sign in:<br>
 Somewhere in PYTHONPATH<br>
 Create a "settings" folder<br>
-In this folder create the following files:
+In this folder create a `plotly_wrapper.py` file containing:
 
-plotly_wrapper.py
 ```
 USERNAME = ''
 API_KEY = ''
@@ -21,6 +20,8 @@ FOOTER = ''  # See Footer section below for a detailed description
 FOOTER_LEFT = ''
 FOOTER_RIGHT = ''
 ```
+
+Note that none of these parameters is mandatory.
 
 # Usage example
 
@@ -59,7 +60,7 @@ pyw.bar(['A', 'B', 'C'], [4, 6, 5],
 A footer can be added to the image. The `fig_height` and `fig_width` parameters do not take into account the footer dimensions. Footer height can be set using the `footer_height` parameter. Footer width will be the same as the original image.
 
 Three-part footers can be configured in `settings.plotly_wrapper.py`:<br>
-1. `FOOTER`: Can be a completer footer or a background image;
+1. `FOOTER`: Can be a completer footer or a background image, mandatory if using any of the other footers below;
 2. `FOOTER_LEFT`: An image to be attached to the left side of the footer;
 3. `FOOTER_RIGHT`: Attached to the right side of the footer.
 
