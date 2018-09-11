@@ -8,7 +8,7 @@ setup(
     packages=['plotlywrapper'],
     version='0.1.0',
     install_requires = [
-    	'numpy',
+        'numpy',
         'plotly',
         'Pillow',
     ],
