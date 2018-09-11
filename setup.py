@@ -1,11 +1,11 @@
 from setuptools import setup
 
 setup(
-    name='Plotly wrapper',
-    url='https://github.com/luizzan/plotly_wrapper',
+    name='plotlywrapper',
+    url='https://github.com/luizzan/plotlywrapper',
     author='Luiz Zanini',
-    author_email='plotly_wrapper@luizzanini.com',
-    packages=['plotly_wrapper'],
+    author_email='plotlywrapper@luizzanini.com',
+    packages=['plotlywrapper'],
     version='0.1.0',
     install_requires = [
     	'numpy',
