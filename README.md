@@ -1,6 +1,6 @@
 # Install
 
-`pip install git+https://github.com/luizzan/plotly_wrapper.git`
+`pip install git+https://github.com/luizzan/plotlywrapper.git`
 
 If running the command from within a virtualenv, be sure to have `wheel` installed in global python.<br>
 Run `pip3 install wheel` outside the virtualenv.
@@ -10,7 +10,7 @@ Run `pip3 install wheel` outside the virtualenv.
 Saving images as PNG files is only available if signed in to Plotly. To automatically sign in:<br>
 Somewhere in PYTHONPATH<br>
 Create a "settings" folder<br>
-In this folder create a `plotly_wrapper.py` file containing:
+In this folder create a `plotlywrapper.py` file containing:
 
 ```
 USERNAME = ''
@@ -28,7 +28,7 @@ Note that none of these parameters is mandatory.
 See more details in `examples.ipynb`
 
 ```
-import plotly_wrapper as pyw
+import plotlywrapper as pyw
 
 # pyw.line(x, y, kwargs)
 pyw.bar(['A', 'B', 'C'], [4, 6, 5])
@@ -59,7 +59,7 @@ pyw.bar(['A', 'B', 'C'], [4, 6, 5],
 
 A footer can be added to the image. The `fig_height` and `fig_width` parameters do not take into account the footer dimensions. Footer height can be set using the `footer_height` parameter. Footer width will be the same as the original image.
 
-Three-part footers can be configured in `settings.plotly_wrapper.py`:<br>
+Three-part footers can be configured in `settings.plotlywrapper.py`:<br>
 1. `FOOTER`: Can be a completer footer or a background image, mandatory if using any of the other footers below;
 2. `FOOTER_LEFT`: An image to be attached to the left side of the footer;
 3. `FOOTER_RIGHT`: Attached to the right side of the footer.

@@ -13,7 +13,7 @@ __version__ = '0.1.0'
 USERNAME, API_KEY, COLORS = '', '', []
 FOOTER, FOOTER_LEFT, FOOTER_RIGHT = '', '', ''
 try:
-    from settings.plotly_wrapper import *
+    from settings.plotlywrapper import *
 except:
     pass
 
@@ -30,7 +30,7 @@ if USERNAME and API_KEY:
     py_sign_in(USERNAME, API_KEY)
 else:
     print('Sign in to Plotly to save high-resolution plots locally.')
-    print('plotly_wrapper.py_sign_in(username, api_key)')
+    print('plotlywrapper.py_sign_in(username, api_key)')
 
 
 # Plot types
@@ -251,7 +251,7 @@ def _plot_or_save(data, kwargs):
             
         except:
             print('Image export error. Check Plotly sign in parameters.')
-            print('plotly_wrapper.py_sign_in(username, api_key)')
+            print('plotlywrapper.py_sign_in(username, api_key)')
             
         # Add footer, if any
         try:
