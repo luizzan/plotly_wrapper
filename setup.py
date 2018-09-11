@@ -6,6 +6,7 @@ setup(
     author='Luiz Zanini',
     author_email='plotly_wrapper@luizzanini.com',
     packages=['plotly_wrapper'],
+    version=0.1.0,
     install_requires = [
     	'numpy',
         'plotly',
