@@ -74,6 +74,9 @@ FOOTER_RIGHT = 'https://raw.githubusercontent.com/luizzan/images/master/pyw_foot
 # Configurable parameters (kwargs):
 
 ```
+names  # Names of each sequence in a multi-line / multi-bar chart
+labels  # Labels for pie charts
+colors  # Color list
 title  # Main title
 x_title  # x axis title
 y_title  # y axis title
@@ -95,6 +98,8 @@ x_showticklabels
 y_showticklabels
 x_showgrid
 y_showgrid
+x_type
+y_type
 leg_orientation  # legend orientation
 leg_traceorder
 leg_x  # legend x position
@@ -104,4 +109,5 @@ bargap
 bargroupgap
 scale  # Figure scale, for higher resolutions. Default is 5
 footer_height  # In pixels, calculated before scaling the figure
+textposition
 ```

@@ -7,7 +7,7 @@ import numpy as np
 import requests
 from PIL import Image
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 # Import plotly settings from file
 USERNAME, API_KEY, COLORS = '', '', []
@@ -160,6 +160,8 @@ def _get_params(kwargs):
     params['y_showticklabels'] = kwargs.pop('y_showticklabels', True)
     params['x_showgrid'] = kwargs.pop('x_showgrid', False)
     params['y_showgrid'] = kwargs.pop('y_showgrid', False)
+    params['x_type'] = kwargs.pop('x_type', '-')
+    params['y_type'] = kwargs.pop('y_type', '-')
 
     params['leg_orientation'] = kwargs.pop('leg_orientation', 'v')
     params['leg_traceorder'] = kwargs.pop('leg_traceorder', 'normal')
@@ -212,6 +214,7 @@ def _get_layout(params):
             range = params['x_range'],
             showgrid=params['x_showgrid'],
             showticklabels=params['x_showticklabels'],
+            type=params['x_type'],
         ),
         yaxis = dict(
             title = params['y_title'],
@@ -220,6 +223,7 @@ def _get_layout(params):
             range = params['y_range'],
             showgrid=params['y_showgrid'],
             showticklabels=params['y_showticklabels'],
+            type=params['y_type'],
         ),
         barmode = params['barmode'],
         bargap = params['bargap'],
