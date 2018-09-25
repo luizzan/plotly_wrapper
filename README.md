@@ -45,6 +45,14 @@ pyw.scatter(['A', 'B', 'C'], [4, 6, 5])
 
 # pyw.pie(x, kwargs)
 pyw.pie([1, 3, 2], labels=['A', 'B', 'C'])
+
+# pyw.network(data, kwargs)
+data = {
+	'banana' : ['fruit', 'yellow', 'long', 'yummy', 'yay'],
+	'jupiter' : ['planet', 'brownish', 'round', 'far', 'science', 'telescope', 'yay'],
+	'orange' : ['fruit', 'orangey', 'round', 'citric'],
+}
+pyw.network([1, 3, 2], labels=['A', 'B', 'C'])
 ```
 
 To save the plot to a png file:

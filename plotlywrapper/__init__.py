@@ -2,12 +2,13 @@ import plotly.plotly as py
 import plotly.offline as po
 import plotly.graph_objs as go
 po.init_notebook_mode(connected=True)
+import networkx as nx
 
 import numpy as np
 import requests
 from PIL import Image
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 # Import plotly settings from file
 USERNAME, API_KEY, COLORS = '', '', []
@@ -35,48 +36,63 @@ else:
 
 # Plot types
 def bar(x, y, **kwargs):
+    kwargs['plot_type'] = 'bar'
     kwargs['orientation'] = 'v'
-    _all_plots('bar', x, y, **kwargs)
+    _all_plots(x, y, **kwargs)
 
 
 def barh(x, y, **kwargs):
+    kwargs['plot_type'] = 'bar'
     kwargs['orientation'] = 'h'
     kwargs['y_autorange'] = kwargs.pop('y_autorange', 'reversed')
-    _all_plots('bar', x, y, **kwargs)
+    _all_plots(x, y, **kwargs)
 
 
 def scatter(x, y, **kwargs):
-    _all_plots('scatter', x, y, **kwargs)
+    kwargs['plot_type'] = 'scatter'
+    _all_plots(x, y, **kwargs)
 
 
 def line(x, y, **kwargs):
-    _all_plots('line', x, y, **kwargs)
+    kwargs['plot_type'] = 'line'
+    _all_plots(x, y, **kwargs)
 
 
 def pie(x, **kwargs):
+    kwargs['plot_type'] = 'pie'
     kwargs['hole'] = kwargs.pop('hole', 0)
     y = x
-    _all_plots('pie', x, y, **kwargs)
+    _all_plots(x, y, **kwargs)
+
+
+def network(x, **kwargs):
+    kwargs['plot_type'] = 'network'
+    y = x
+    _all_plots(x, y, **kwargs)
 
 
 # Plot aggregator
-def _all_plots(plot_type, x, y, **kwargs):
+def _all_plots(x, y, **kwargs):
 
-    if type(x[0]) != list:
+    if kwargs['plot_type'] != 'network':
+        if type(x[0]) != list:
+            x = [x]
+            y = [y]
+    else:
         x = [x]
         y = [y]
 
     names = kwargs.pop('names', ['']*len(x))
     text = kwargs.pop('text', ['']*len(x))
     textposition = kwargs.pop('textposition', 'auto')
-    if plot_type != 'pie':
+    if kwargs['plot_type'] not in ['pie', 'network']:
         colors = kwargs.pop('colors', COLORS)
         colors = colors + (len(x)-len(colors))*['#000000']
     
     data = []
     for i, (_x, _y, _text, _name) in enumerate(zip(x, y, text, names)):
 
-        if plot_type == 'bar':
+        if kwargs['plot_type'] == 'bar':
             data.append(go.Bar(
                 x=_x,
                 y=_y,
@@ -87,7 +103,7 @@ def _all_plots(plot_type, x, y, **kwargs):
                 marker=dict(color=colors[i]),
             ))
 
-        elif plot_type == 'scatter':
+        elif kwargs['plot_type'] == 'scatter':
             data.append(go.Scatter(
                 x=_x,
                 y=_y,
@@ -97,7 +113,7 @@ def _all_plots(plot_type, x, y, **kwargs):
                 marker=dict(color=colors[i]),
             ))
 
-        elif plot_type == 'line':
+        elif kwargs['plot_type'] == 'line':
             data.append(go.Scatter(
                 x=_x,
                 y=_y,
@@ -106,7 +122,8 @@ def _all_plots(plot_type, x, y, **kwargs):
                 mode='lines',
                 marker=dict(color=colors[i]),
             ))
-        elif plot_type == 'pie':
+
+        elif kwargs['plot_type'] == 'pie':
 
             colors = kwargs.pop('colors', COLORS)
             colors = colors + (len(_x)-len(colors))*['#000000']
@@ -121,6 +138,59 @@ def _all_plots(plot_type, x, y, **kwargs):
                 direction='clockwise',
                 sort=False,
             ))
+
+        elif kwargs['plot_type'] == 'network':
+
+            colors = kwargs.pop('colors', [COLORS[0], COLORS[2]])
+
+            G = nx.Graph()
+            # Add nodes
+            for key, vals in _x.items():
+                G.add_node(key)
+                for val in vals:
+                    G.add_node(val)
+
+            # Add edges
+            for key, vals in _x.items():
+                for val in vals:
+                    G.add_edge(key, val)
+
+            # Get node positions
+            pos = nx.spring_layout(G)
+
+            # Prepare go
+            node_trace_l = go.Scatter(
+                x=[], y=[], text=[], mode='text',
+                textfont=dict(color=colors[0], size=20))
+            node_trace_s = go.Scatter(
+                x=[], y=[], text=[], mode='text',
+                textfont=dict(color=colors[1], size=15))
+            edge_trace = go.Scatter(
+                x=[], y=[], mode='lines', opacity=0.3,
+                line=dict(width=3, color=colors[1]))
+
+            # Trace nodes
+            for key, vals in pos.items():
+                xx, yy = pos[key]
+                
+                if key in _x.keys():
+                    node_trace_l['x'] += tuple([xx])
+                    node_trace_l['y'] += tuple([yy])
+                    node_trace_l['text'] += tuple([key])
+                else:
+                    node_trace_s['x'] += tuple([xx])
+                    node_trace_s['y'] += tuple([yy])
+                    node_trace_s['text'] += tuple([key])
+                    
+            # Trace edges
+            for key, vals in _x.items():
+                for val in vals:
+                    x0, y0 = pos[key]
+                    x1, y1 = pos[val]
+                    edge_trace['x'] += tuple([x0, x1, None])
+                    edge_trace['y'] += tuple([y0, y1, None])
+
+            data += [edge_trace, node_trace_l, node_trace_s]
 
     _plot_or_save(data, kwargs)
 
@@ -156,8 +226,17 @@ def _get_params(kwargs):
     else:
         params['y_autorange'] = kwargs.pop('y_autorange', False)
 
-    params['x_showticklabels'] = kwargs.pop('x_showticklabels', True)
-    params['y_showticklabels'] = kwargs.pop('y_showticklabels', True)
+    if kwargs['plot_type'] == 'network':
+        params['x_showticklabels'] = kwargs.pop('x_showticklabels', False)
+        params['y_showticklabels'] = kwargs.pop('y_showticklabels', False)
+        params['x_zeroline'] = kwargs.pop('x_zeroline', False)
+        params['y_zeroline'] = kwargs.pop('y_zeroline', False)
+    else:
+        params['x_showticklabels'] = kwargs.pop('x_showticklabels', True)
+        params['y_showticklabels'] = kwargs.pop('y_showticklabels', True)
+        params['x_zeroline'] = kwargs.pop('x_zeroline', True)
+        params['y_zeroline'] = kwargs.pop('y_zeroline', True)
+
     params['x_showgrid'] = kwargs.pop('x_showgrid', False)
     params['y_showgrid'] = kwargs.pop('y_showgrid', False)
     params['x_type'] = kwargs.pop('x_type', '-')
@@ -167,6 +246,12 @@ def _get_params(kwargs):
     params['leg_traceorder'] = kwargs.pop('leg_traceorder', 'normal')
     params['leg_x'] = kwargs.pop('leg_x', 1.02)
     params['leg_y'] = kwargs.pop('leg_y', 1.00)
+
+
+    if kwargs['plot_type'] == 'network':
+        params['showlegend'] = kwargs.pop('showlegend', False)
+    else:
+        params['showlegend'] = kwargs.pop('showlegend', True)
 
     params['barmode'] = kwargs.pop('barmode', 'group')
     params['bargap'] = kwargs.pop('bargap', 0)
@@ -214,6 +299,7 @@ def _get_layout(params):
             range = params['x_range'],
             showgrid=params['x_showgrid'],
             showticklabels=params['x_showticklabels'],
+            zeroline=params['x_zeroline'],
             type=params['x_type'],
         ),
         yaxis = dict(
@@ -223,11 +309,13 @@ def _get_layout(params):
             range = params['y_range'],
             showgrid=params['y_showgrid'],
             showticklabels=params['y_showticklabels'],
+            zeroline=params['y_zeroline'],
             type=params['y_type'],
         ),
         barmode = params['barmode'],
         bargap = params['bargap'],
         bargroupgap = params['bargroupgap'],
+        showlegend = params['showlegend'],
         legend = dict(
             orientation=params['leg_orientation'],
             traceorder=params['leg_traceorder'],
