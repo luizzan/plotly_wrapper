@@ -77,6 +77,12 @@ pyw.heatmap(
     ['Alice', 'Bob'],
     [[2, 3], [1, 4]],
 )
+
+# pyw.table(header, cells, kwargs)
+pyw.table(
+    ['Apples'],
+    [1, 2, 3, 4],
+)
 ```
 
 To save the plot to a png file:

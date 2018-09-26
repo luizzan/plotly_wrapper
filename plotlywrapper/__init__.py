@@ -4,11 +4,12 @@ import plotly.graph_objs as go
 po.init_notebook_mode(connected=True)
 import networkx as nx
 
+import pandas as pd
 import numpy as np
 import requests
 from PIL import Image
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 # Import plotly settings from file
 USERNAME, API_KEY, COLORS, COLORSCALE = '', '', [], []
@@ -61,14 +62,12 @@ def line(x, y, **kwargs):
 def pie(x, **kwargs):
     kwargs['plot_type'] = 'pie'
     kwargs['hole'] = kwargs.pop('hole', 0)
-    y = x
-    _all_plots(x, y, **kwargs)
+    _all_plots(x, x, **kwargs)
 
 
 def network(x, **kwargs):
     kwargs['plot_type'] = 'network'
-    y = x
-    _all_plots(x, y, **kwargs)
+    _all_plots(x, x, **kwargs)
 
 
 def heatmap(x, y, z, **kwargs):
@@ -77,10 +76,15 @@ def heatmap(x, y, z, **kwargs):
     _all_plots(x, y, **kwargs)
 
 
+def table(header, cells, **kwargs):
+    kwargs['plot_type'] = 'table'
+    _all_plots(header, cells, **kwargs)
+
+
 # Plot aggregator
 def _all_plots(x, y, **kwargs):
 
-    if kwargs['plot_type'] in ['network', 'heatmap']:
+    if kwargs['plot_type'] in ['network', 'heatmap', 'table']:
         x = [x]
         y = [y]
     else:
@@ -208,6 +212,33 @@ def _all_plots(x, y, **kwargs):
                 z=kwargs['z'],
                 colorscale=colorscale,
             ))
+
+        elif kwargs['plot_type'] == 'table':
+
+            # Prepare plot
+            header = _x
+            if header:
+                if type(header) != list:
+                    header = [header]
+                header = ['<b>{}</b>'.format(i) for i in header]
+                header_height=30
+            else:
+                header=['']
+                header_height=0
+            cells = _y
+            if type(cells[0]) != list:
+                cells = [cells]
+
+            data.append(go.Table(
+                header=dict(values=header, height=header_height),
+                cells=dict(values=cells, height=20),
+            ))
+
+            # Calculate plot height
+            if not kwargs.get('fig_height', None):
+                margins = kwargs.get('t_margin', 0) + kwargs.get('b_margin', 0)
+                kwargs['fig_height'] = margins + header_height + 20*len(cells[0]) + 1
+
 
     _plot_or_save(data, kwargs)
 
