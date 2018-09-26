@@ -31,20 +31,37 @@ See more details in `examples.ipynb`
 import plotlywrapper as pyw
 
 # pyw.line(x, y, kwargs)
-pyw.bar(['A', 'B', 'C'], [4, 6, 5])
-pyw.bar([['A', 'B', 'C'], ['A', 'B', 'C']], [[1,3,2], [2,1,5]])
+pyw.bar(
+	['A', 'B', 'C'],
+	[4, 6, 5]
+)
+pyw.bar(
+	[['A', 'B', 'C'], ['A', 'B', 'C']],
+	[[1,3,2], [2,1,5]]
+)
 
 # pyw.bar(x, y, kwargs)
-pyw.bar(['A', 'B', 'C'], [4, 6, 5])
+pyw.bar(
+	['A', 'B', 'C'],
+	[4, 6, 5]
+)
 
 # pyw.barh(x, y, kwargs)
-pyw.barh([4, 6, 5], ['A', 'B', 'C'])
+pyw.barh(
+	[4, 6, 5],
+	['A', 'B', 'C']
+)
 
 # pyw.scatter(x, y, kwargs)
-pyw.scatter(['A', 'B', 'C'], [4, 6, 5])
+pyw.scatter(
+	['A', 'B', 'C'],
+	[4, 6, 5]
+)
 
 # pyw.pie(x, kwargs)
-pyw.pie([1, 3, 2], labels=['A', 'B', 'C'])
+pyw.pie([1, 3, 2],
+	labels=['A', 'B', 'C']
+)
 
 # pyw.network(data, kwargs)
 data = {
@@ -52,7 +69,14 @@ data = {
 	'jupiter' : ['planet', 'brownish', 'round', 'far', 'science', 'telescope', 'yay'],
 	'orange' : ['fruit', 'orangey', 'round', 'citric'],
 }
-pyw.network([1, 3, 2], labels=['A', 'B', 'C'])
+pyw.network(data)
+
+# pyw.heatmap(x, y, z, kwargs)
+pyw.heatmap(
+    ['Apples', 'Bananas'],
+    ['Alice', 'Bob'],
+    [[2, 3], [1, 4]],
+)
 ```
 
 To save the plot to a png file:

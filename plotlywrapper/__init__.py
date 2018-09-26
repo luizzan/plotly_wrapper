@@ -8,10 +8,10 @@ import numpy as np
 import requests
 from PIL import Image
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 # Import plotly settings from file
-USERNAME, API_KEY, COLORS = '', '', []
+USERNAME, API_KEY, COLORS, COLORSCALE = '', '', [], []
 FOOTER, FOOTER_LEFT, FOOTER_RIGHT = '', '', ''
 try:
     from settings.plotlywrapper import *
@@ -71,16 +71,23 @@ def network(x, **kwargs):
     _all_plots(x, y, **kwargs)
 
 
+def heatmap(x, y, z, **kwargs):
+    kwargs['plot_type'] = 'heatmap'
+    kwargs['z'] = z
+    _all_plots(x, y, **kwargs)
+
+
 # Plot aggregator
 def _all_plots(x, y, **kwargs):
 
-    if kwargs['plot_type'] != 'network':
+    if kwargs['plot_type'] in ['network', 'heatmap']:
+        x = [x]
+        y = [y]
+    else:
         if type(x[0]) != list:
             x = [x]
             y = [y]
-    else:
-        x = [x]
-        y = [y]
+        
 
     names = kwargs.pop('names', ['']*len(x))
     text = kwargs.pop('text', ['']*len(x))
@@ -88,6 +95,8 @@ def _all_plots(x, y, **kwargs):
     if kwargs['plot_type'] not in ['pie', 'network']:
         colors = kwargs.pop('colors', COLORS)
         colors = colors + (len(x)-len(colors))*['#000000']
+        colorscale = kwargs.pop('colorscale', COLORSCALE)
+        colorscale = colorscale if colorscale else 'RdBu'
     
     data = []
     for i, (_x, _y, _text, _name) in enumerate(zip(x, y, text, names)):
@@ -191,6 +200,14 @@ def _all_plots(x, y, **kwargs):
                     edge_trace['y'] += tuple([y0, y1, None])
 
             data += [edge_trace, node_trace_l, node_trace_s]
+
+        elif kwargs['plot_type'] == 'heatmap':
+            data.append(go.Heatmap(
+                x=_x,
+                y=_y,
+                z=kwargs['z'],
+                colorscale=colorscale,
+            ))
 
     _plot_or_save(data, kwargs)
 
