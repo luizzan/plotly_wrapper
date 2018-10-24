@@ -9,7 +9,7 @@ import numpy as np
 import requests
 from PIL import Image
 
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 # Import plotly settings from file
 USERNAME, API_KEY, COLORS, COLORSCALE = '', '', [], []
@@ -61,7 +61,6 @@ def line(x, y, **kwargs):
 
 def pie(x, **kwargs):
     kwargs['plot_type'] = 'pie'
-    kwargs['hole'] = kwargs.pop('hole', 0)
     _all_plots(x, x, **kwargs)
 
 
@@ -145,9 +144,9 @@ def _all_plots(x, y, **kwargs):
             data.append(go.Pie(
                 values=_x,
                 labels=kwargs.pop('labels', ['']*len(_x)),
-                textinfo='none',
+                textinfo=kwargs.pop('textinfo', 'none'),
                 marker=dict(colors=colors),
-                hole=kwargs['hole'],
+                hole=kwargs.pop('hole', 0),
                 direction='clockwise',
                 sort=False,
             ))
