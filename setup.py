@@ -6,11 +6,12 @@ setup(
     author='Luiz Zanini',
     author_email='plotlywrapper@luizzanini.com',
     packages=['plotlywrapper'],
-    version='0.1.5',
+    version='0.2.0',
     install_requires = [
         'numpy',
         'plotly',
         'Pillow',
         'networkx',
+        'matplotlib',
     ],
 )

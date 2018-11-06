@@ -2,424 +2,271 @@ import plotly.plotly as py
 import plotly.offline as po
 import plotly.graph_objs as go
 po.init_notebook_mode(connected=True)
-import networkx as nx
 
-import pandas as pd
-import numpy as np
-import requests
-from PIL import Image
-
-__version__ = '0.1.5'
-
-# Import plotly settings from file
-USERNAME, API_KEY, COLORS, COLORSCALE = '', '', [], []
-FOOTER, FOOTER_LEFT, FOOTER_RIGHT = '', '', ''
-try:
-    from settings.plotlywrapper import *
-except:
-    pass
+from ._add_footer import _add_footer
+from ._bar import _bar
+from ._barh import _barh
+from ._heatmap import _heatmap
+from ._layout_basic import _layout_basic
+from ._line import _line
+from ._network import _network
+from ._pie import _pie
+from ._scatter import _scatter
+from ._scattermapbox import _scattermapbox
+from ._table import _table
+from .load_settings import load_settings
 
 
-def py_sign_in(username, api_key):
-    try:
-        py.sign_in(username, api_key)
-    except:
-        print('Plotly sign in error. Saving plots to png is not available.')
-
-
-# Try to sign in automatically
-if USERNAME and API_KEY:
-    py_sign_in(USERNAME, API_KEY)
-else:
-    print('Sign in to Plotly to save high-resolution plots locally.')
-    print('plotlywrapper.py_sign_in(username, api_key)')
+__version__ = '0.2.0'
 
 
 # Plot types
-def bar(x, y, **kwargs):
-    kwargs['plot_type'] = 'bar'
-    kwargs['orientation'] = 'v'
-    _all_plots(x, y, **kwargs)
+class PlotlyWrapper():
+    """
+    Plotly wrapper.
+    Parameters valid for all plots:
+    - height
+    - width
+    - margin_t
+    - margin_b
+    - margin_l
+    - margin_r
+    - pad
+    - title
+    - showlegend
+    - leg_orientation
+    - leg_traceorder
+    - leg_x
+    - leg_y
+
+    All parameters below can also be used for the y axis
+    - x_title
+    - x_tickangle
+    - x_autorange
+    - x_range
+    - x_showgrid
+    - x_showticklabels
+    - x_zeroline
+    - x_type
+    """
+
+    def __init__(self):
+        self.data = []
+        self.layout = {}
 
 
-def barh(x, y, **kwargs):
-    kwargs['plot_type'] = 'bar'
-    kwargs['orientation'] = 'h'
-    kwargs['y_autorange'] = kwargs.pop('y_autorange', 'reversed')
-    _all_plots(x, y, **kwargs)
+    def load_settings(self, settings_file):
+        """
+        Load settings from JSON file.
+        File format example:
+        {
+            "username" : "",
+            "api_key" : "",
+            "mapbox_token" : "",
+            "colors" : ["#FFFFFF", "#000000"],
+            "colorscale" : [[0.0, "#FFFFFF"], [0.5, "#FF0000"], [1, "#000000"]],
+            "footer" : "https://raw.githubusercontent.com/luizzan/images/master/pyw_footer.png",
+            "footer_left" : "https://raw.githubusercontent.com/luizzan/images/master/pyw_footer_left.png",
+            "footer_right" : "https://raw.githubusercontent.com/luizzan/images/master/pyw_footer_right.png",
+        }
+        """
+
+        load_settings(self, settings_file)
 
 
-def scatter(x, y, **kwargs):
-    kwargs['plot_type'] = 'scatter'
-    _all_plots(x, y, **kwargs)
+    def line(self, x, y, **kwargs):
+        """
+        Plot line chart.
+        Parameters:
+        - x
+        - y
+        - names
+        - text
+        """
+
+        kwargs['x'] = x
+        kwargs['y'] = y
+        self._all_plots(_line(self, kwargs))
 
 
-def line(x, y, **kwargs):
-    kwargs['plot_type'] = 'line'
-    _all_plots(x, y, **kwargs)
+    def scatter(self, x, y, **kwargs):
+        """
+        Plot scatter chart.
+        Parameters:
+        - x
+        - y
+        - names
+        - text
+        """
+
+        kwargs['x'] = x
+        kwargs['y'] = y
+        self._all_plots(_scatter(self, kwargs))
 
 
-def pie(x, **kwargs):
-    kwargs['plot_type'] = 'pie'
-    _all_plots(x, x, **kwargs)
+    def bar(self, x, y, **kwargs):
+        """
+        Plot vertical bar chart.
+        Parameters:
+        - x
+        - y
+        - names
+        - text
+        - barmode
+        - bargap
+        - bargroupgap
+        """
+
+        kwargs['x'] = x
+        kwargs['y'] = y
+        self._all_plots(_bar(self, kwargs))
 
 
-def network(x, **kwargs):
-    kwargs['plot_type'] = 'network'
-    _all_plots(x, x, **kwargs)
+    def barh(self, x, y, **kwargs):
+        """
+        Plot horizontal bar chart.
+        Parameters:
+        - x
+        - y
+        - names
+        - text
+        - barmode
+        - bargap
+        - bargroupgap
+        """
+
+        kwargs['x'] = x
+        kwargs['y'] = y
+        self._all_plots(_barh(self, kwargs))
 
 
-def heatmap(x, y, z, **kwargs):
-    kwargs['plot_type'] = 'heatmap'
-    kwargs['z'] = z
-    _all_plots(x, y, **kwargs)
+    def pie(self, values, **kwargs):
+        """
+        Plot pie chart.
+        Parameters:
+        - values
+        - labels
+        - textinfo
+        - hole
+        - direction
+        - sort
+        """
+
+        kwargs['values'] = values
+        self._all_plots(_pie(self, kwargs))
 
 
-def table(header, cells, **kwargs):
-    kwargs['plot_type'] = 'table'
-    _all_plots(header, cells, **kwargs)
+    def network(self, data, **kwargs):
+        """
+        Plot network.
+        Parameters:
+        - data
+        - edge_width
+        - edge_opacity
+        """
+
+        kwargs['data'] = data
+        self._all_plots(_network(self, kwargs))
 
 
-# Plot aggregator
-def _all_plots(x, y, **kwargs):
+    def heatmap(self, x, y, z, **kwargs):
+        """
+        Plot heatmap.
+        Parameters:
+        - x
+        - y
+        - z
+        - colorscale
+        """
 
-    if kwargs['plot_type'] in ['network', 'heatmap', 'table']:
-        x = [x]
-        y = [y]
-    else:
-        if type(x[0]) != list:
-            x = [x]
-            y = [y]
-        
-
-    names = kwargs.pop('names', ['']*len(x))
-    text = kwargs.pop('text', ['']*len(x))
-    textposition = kwargs.pop('textposition', 'auto')
-    if kwargs['plot_type'] not in ['pie', 'network']:
-        colors = kwargs.pop('colors', COLORS)
-        colors = colors + (len(x)-len(colors))*['#000000']
-        colorscale = kwargs.pop('colorscale', COLORSCALE)
-        colorscale = colorscale if colorscale else 'RdBu'
-    
-    data = []
-    for i, (_x, _y, _text, _name) in enumerate(zip(x, y, text, names)):
-
-        if kwargs['plot_type'] == 'bar':
-            data.append(go.Bar(
-                x=_x,
-                y=_y,
-                text=_text,
-                textposition=textposition,
-                name=_name,
-                orientation=kwargs['orientation'],
-                marker=dict(color=colors[i]),
-            ))
-
-        elif kwargs['plot_type'] == 'scatter':
-            data.append(go.Scatter(
-                x=_x,
-                y=_y,
-                text=_text,
-                name=_name,
-                mode='markers',
-                marker=dict(color=colors[i]),
-            ))
-
-        elif kwargs['plot_type'] == 'line':
-            data.append(go.Scatter(
-                x=_x,
-                y=_y,
-                text=_text,
-                name=_name,
-                mode='lines',
-                marker=dict(color=colors[i]),
-            ))
-
-        elif kwargs['plot_type'] == 'pie':
-
-            colors = kwargs.pop('colors', COLORS)
-            colors = colors + (len(_x)-len(colors))*['#000000']
-            colors = colors[:len(_x)]  # Seed only the required colors
-
-            data.append(go.Pie(
-                values=_x,
-                labels=kwargs.pop('labels', ['']*len(_x)),
-                textinfo=kwargs.pop('textinfo', 'none'),
-                marker=dict(colors=colors),
-                hole=kwargs.pop('hole', 0),
-                direction='clockwise',
-                sort=False,
-            ))
-
-        elif kwargs['plot_type'] == 'network':
-
-            colors = kwargs.pop('colors', [COLORS[0], COLORS[2]])
-
-            G = nx.Graph()
-            # Add nodes
-            for key, vals in _x.items():
-                G.add_node(key)
-                for val in vals:
-                    G.add_node(val)
-
-            # Add edges
-            for key, vals in _x.items():
-                for val in vals:
-                    G.add_edge(key, val)
-
-            # Get node positions
-            pos = nx.spring_layout(G)
-
-            # Prepare go
-            node_trace_l = go.Scatter(
-                x=[], y=[], text=[], mode='text',
-                textfont=dict(color=colors[0], size=20))
-            node_trace_s = go.Scatter(
-                x=[], y=[], text=[], mode='text',
-                textfont=dict(color=colors[1], size=15))
-            edge_trace = go.Scatter(
-                x=[], y=[], mode='lines', opacity=0.3,
-                line=dict(width=3, color=colors[1]))
-
-            # Trace nodes
-            for key, vals in pos.items():
-                xx, yy = pos[key]
-                
-                if key in _x.keys():
-                    node_trace_l['x'] += tuple([xx])
-                    node_trace_l['y'] += tuple([yy])
-                    node_trace_l['text'] += tuple([key])
-                else:
-                    node_trace_s['x'] += tuple([xx])
-                    node_trace_s['y'] += tuple([yy])
-                    node_trace_s['text'] += tuple([key])
-                    
-            # Trace edges
-            for key, vals in _x.items():
-                for val in vals:
-                    x0, y0 = pos[key]
-                    x1, y1 = pos[val]
-                    edge_trace['x'] += tuple([x0, x1, None])
-                    edge_trace['y'] += tuple([y0, y1, None])
-
-            data += [edge_trace, node_trace_l, node_trace_s]
-
-        elif kwargs['plot_type'] == 'heatmap':
-            data.append(go.Heatmap(
-                x=_x,
-                y=_y,
-                z=kwargs['z'],
-                colorscale=colorscale,
-            ))
-
-        elif kwargs['plot_type'] == 'table':
-
-            # Prepare plot
-            header = _x
-            if header:
-                if type(header) != list:
-                    header = [header]
-                header = ['<b>{}</b>'.format(i) for i in header]
-                header_height=30
-            else:
-                header=['']
-                header_height=0
-            cells = _y
-            if type(cells[0]) != list:
-                cells = [cells]
-
-            data.append(go.Table(
-                header=dict(values=header, height=header_height),
-                cells=dict(values=cells, height=20),
-            ))
-
-            # Calculate plot height
-            if not kwargs.get('fig_height', None):
-                margins = kwargs.get('t_margin', 0) + kwargs.get('b_margin', 0)
-                kwargs['fig_height'] = margins + header_height + 20*len(cells[0]) + 1
+        kwargs['x'] = x
+        kwargs['y'] = y
+        kwargs['z'] = z
+        self._all_plots(_heatmap(self, kwargs))
 
 
-    _plot_or_save(data, kwargs)
+    def table(self, header, cells, **kwargs):
+        """
+        Plot table.
+        Parameters:
+        - header
+        - cells
+        - header_height
+        - cell_height
+        """
+
+        kwargs['header'] = header
+        kwargs['cells'] = cells
+        self._all_plots(_table(self, kwargs))
 
 
-def _get_params(kwargs):
-    
-    params = {}
-    params['title'] = kwargs.pop('title', '')
-    params['x_title'] = kwargs.pop('x_title', '')
-    params['y_title'] = kwargs.pop('y_title', '')
-    params['fig_width'] = kwargs.pop('fig_width', 800)
-    params['fig_height'] = kwargs.pop('fig_height', 400)
-    if params['title']:
-        params['t_margin'] = kwargs.pop('t_margin', 30)
-    else:
-        params['t_margin'] = kwargs.pop('t_margin', 0)
-    params['b_margin'] = kwargs.pop('b_margin', 40)
-    params['r_margin'] = kwargs.pop('r_margin', 0)
-    params['l_margin'] = kwargs.pop('l_margin', 60)
-    params['pad'] = kwargs.pop('pad', 5)
-    params['filename'] = kwargs.pop('filename', '')
-    params['x_tickangle'] = kwargs.pop('x_tickangle', 0)
-    params['y_tickangle'] = kwargs.pop('y_tickangle', 0)
-    
-    params['x_range'] = kwargs.pop('x_range', [0, 0])
-    if params['x_range'] == [0, 0]:
-        params['x_autorange'] = kwargs.pop('x_autorange', True)
-    else:
-        params['x_autorange'] = kwargs.pop('x_autorange', False)
-    params['y_range'] = kwargs.pop('y_range', [0, 0])
-    if params['y_range'] == [0, 0]:
-        params['y_autorange'] = kwargs.pop('y_autorange', True)
-    else:
-        params['y_autorange'] = kwargs.pop('y_autorange', False)
+    def scattermapbox(self, location, values, **kwargs):
+        """
+        Plot map.
+        Parameters:
+        - location
+        - values (dict or dataframe)
+        - colorscale
+        - range
+        - showscale
+        - bearing
+        - lat
+        - lon
+        - pitch
+        - zoom
+        - style
+        - autocolorscale
+        - colorbar_thickness
+        - colorbar_titleside
+        - colorbar_outlinecolor
+        - colorbar_ticks
+        - colorbar_ticklen
+        - colorbar_ticksuffix
+        - colorbar_dtick
+        """
 
-    if kwargs['plot_type'] == 'network':
-        params['x_showticklabels'] = kwargs.pop('x_showticklabels', False)
-        params['y_showticklabels'] = kwargs.pop('y_showticklabels', False)
-        params['x_zeroline'] = kwargs.pop('x_zeroline', False)
-        params['y_zeroline'] = kwargs.pop('y_zeroline', False)
-    else:
-        params['x_showticklabels'] = kwargs.pop('x_showticklabels', True)
-        params['y_showticklabels'] = kwargs.pop('y_showticklabels', True)
-        params['x_zeroline'] = kwargs.pop('x_zeroline', True)
-        params['y_zeroline'] = kwargs.pop('y_zeroline', True)
-
-    params['x_showgrid'] = kwargs.pop('x_showgrid', False)
-    params['y_showgrid'] = kwargs.pop('y_showgrid', False)
-    params['x_type'] = kwargs.pop('x_type', '-')
-    params['y_type'] = kwargs.pop('y_type', '-')
-
-    params['leg_orientation'] = kwargs.pop('leg_orientation', 'v')
-    params['leg_traceorder'] = kwargs.pop('leg_traceorder', 'normal')
-    params['leg_x'] = kwargs.pop('leg_x', 1.02)
-    params['leg_y'] = kwargs.pop('leg_y', 1.00)
+        self._all_plots(_scattermapbox(self, location, values, kwargs))
 
 
-    if kwargs['plot_type'] == 'network':
-        params['showlegend'] = kwargs.pop('showlegend', False)
-    else:
-        params['showlegend'] = kwargs.pop('showlegend', True)
-
-    params['barmode'] = kwargs.pop('barmode', 'group')
-    params['bargap'] = kwargs.pop('bargap', 0)
-    params['bargroupgap'] = kwargs.pop('bargroupgap', 0)
-    
-#     # Calculate position of the SEMrush banner
-#     params['y_banner'] = -1*params['b_margin']/(params['fig_height'] - params['b_margin'] - params['t_margin'])
-#     params['x_banner'] = -1*params['l_margin']/(params['fig_width'] - params['l_margin'] - params['r_margin'])
-#     params['x_sz_banner'] = params['fig_width']/(params['fig_width'] - params['l_margin'] - params['r_margin'])
-
-    return params
+    def _all_plots(self, kwargs):
+        _layout_basic(self, **kwargs)
 
 
-def _get_layout(params):
-    
-    layout = go.Layout(
-        title = params['title'],
-        width = params['fig_width'],
-        height = params['fig_height'],
-#         Plotly does not support referencing for sizes
-#         so the footer cannot have the same width as the
-#         image if there is a legend. PIL is used instead.
-#         images = [dict(
-#             x = params['x_banner'],
-#             y = params['y_banner'],
-#             sizex = params['x_sz_banner'],
-#             sizey = 1,
-#             source = 'https://raw.githubusercontent.com/luizzan/images/master/pyw_footer.png',
-#             xref = 'paper',
-#             yref = 'paper',
-#             xanchor = 'left',
-#             yanchor = 'bottom',
-#         )],
-        margin = dict(
-            t = params['t_margin'],
-            b = params['b_margin'],
-            r = params['r_margin'],
-            l = params['l_margin'],
-            pad = params['pad'],
-        ),
-        xaxis = dict(
-            title = params['x_title'],
-            tickangle = params['x_tickangle'],
-            autorange = params['x_autorange'],
-            range = params['x_range'],
-            showgrid=params['x_showgrid'],
-            showticklabels=params['x_showticklabels'],
-            zeroline=params['x_zeroline'],
-            type=params['x_type'],
-        ),
-        yaxis = dict(
-            title = params['y_title'],
-            tickangle = params['y_tickangle'],
-            autorange = params['y_autorange'],
-            range = params['y_range'],
-            showgrid=params['y_showgrid'],
-            showticklabels=params['y_showticklabels'],
-            zeroline=params['y_zeroline'],
-            type=params['y_type'],
-        ),
-        barmode = params['barmode'],
-        bargap = params['bargap'],
-        bargroupgap = params['bargroupgap'],
-        showlegend = params['showlegend'],
-        legend = dict(
-            orientation=params['leg_orientation'],
-            traceorder=params['leg_traceorder'],
-            x = params['leg_x'],
-            y = params['leg_y'],
-        ),
-    )
-
-    return layout
+    def layout(self, **kwargs):
+        """
+        Add parameters to layout.
+        """
+        self.layout.update(kwargs)
 
 
-def _plot_or_save(data, kwargs):
+    def plot(self):
+        """
+        Plot chart.
+        """
 
-    params = _get_params(kwargs)
-    layout = _get_layout(params)
-    filename = params['filename']
+        po.plot(dict(data=self.data, layout=self.layout))
+        self.__init__()  # Remove previous plot and layout data
 
-    if filename:
+
+    def save(self, filename='', scale=5, footer_height=48):
+        """
+        Save plot locally.
+        Parameters:
+        - filename
+        - scale
+        - footer_height
+        """
+
         try:
-            scale = kwargs.pop('scale', 5)
-            py.image.save_as(dict(data=data, layout=layout),
-                             filename=filename,
-                             scale=scale,
+            py.sign_in(self.username, self.api_key)
+            py.image.save_as(
+                dict(data=self.data, layout=self.layout),
+                filename=filename,
+                scale=scale,
             )
-            
-        except:
-            print('Image export error. Check Plotly sign in parameters.')
-            print('plotlywrapper.py_sign_in(username, api_key)')
-            
-        # Add footer, if any
-        try:
-            if FOOTER:
-                footer_height = kwargs.pop('footer_height', 40)
-                footer_height = footer_height*scale
-                
-                main_img = Image.open(filename)
-                footer_img = Image.open(requests.get(FOOTER, stream=True).raw)
-                footer_img = footer_img.resize((main_img.size[0], footer_height))
-                if FOOTER_LEFT:
-                    with Image.open(requests.get(FOOTER_LEFT, stream=True).raw) as _left:
-                        _aspect_ratio = _left.size[0]/_left.size[1]
-                        _width = round(_aspect_ratio*footer_height)
-                        _left = _left.resize((_width, footer_height), Image.ANTIALIAS)
-                        footer_img.paste(_left, (0,0))
-                if FOOTER_RIGHT:
-                    with Image.open(requests.get(FOOTER_RIGHT, stream=True).raw) as _right:
-                        _aspect_ratio = _right.size[0]/_right.size[1]
-                        _width = round(_aspect_ratio*footer_height)
-                        _right = _right.resize((_width, footer_height), Image.ANTIALIAS)
-                        footer_img.paste(_left, (0,0))
-                        _pos = footer_img.size[0]-_right.size[0]
-                        footer_img.paste(_right, (_pos,0))
-                imgs = np.vstack([main_img, footer_img])
-                Image.fromarray(imgs).save(filename)
+            _add_footer(self, filename=filename, scale=scale, footer_height=footer_height)
+        except Exception as e:
+            print(e)
+            print('\n\nImage export error. Check Plotly username and API key.')
 
-        except:
-            print('Image export error. Check footer images.')
-
-    else:
-        po.plot(dict(data=data, layout=layout))
+        self.__init__()  # Remove previous plot and layout data
