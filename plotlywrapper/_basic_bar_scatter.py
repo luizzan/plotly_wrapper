@@ -26,7 +26,9 @@ def _basic_bar_scatter(self, kwargs):
             text = text,
             name = name,
             orientation = kwargs.get('orientation', 'v'),
-            marker = dict(color=kwargs['colors'][i] if kwargs['colors'] else None),
+            marker = dict(
+                color=kwargs['colors'][i] if kwargs['colors'] and i < len(kwargs['colors']) else None
+                ),
         )
         if kwargs['plot_type'] == 'bar':
             data.update(
