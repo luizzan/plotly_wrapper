@@ -29,6 +29,9 @@ def _basic_bar_scatter(self, kwargs):
             marker = dict(
                 color=kwargs['colors'][i] if kwargs['colors'] and i < len(kwargs['colors']) else None
                 ),
+            line = dict(
+                dash = kwargs.get('dash', 'solid'),
+                ),
         )
         if kwargs['plot_type'] == 'bar':
             data.update(
