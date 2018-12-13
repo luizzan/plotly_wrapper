@@ -13,3 +13,4 @@ def load_settings(self, json_settings):
     self.footer_left = kwargs.get('footer_left', '')
     self.footer_right = kwargs.get('footer_right', '')
     self.mapbox_token = kwargs.get('mapbox_token', '')
+    self.plot_inline = kwargs.get('plot_inline', False)

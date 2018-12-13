@@ -22,6 +22,7 @@ A settings file can be used to store usernames, passwords and a few other parame
 	"footer" : "https://raw.githubusercontent.com/luizzan/images/master/pyw_footer.png",
 	"footer_left" : "https://raw.githubusercontent.com/luizzan/images/master/pyw_footer_left.png",
 	"footer_right" : "https://raw.githubusercontent.com/luizzan/images/master/pyw_footer_right.png",
+    "plot_inline" : true
 }
 ```
 

@@ -17,7 +17,7 @@ from ._table import _table
 from .load_settings import load_settings
 
 
-__version__ = '0.2.4'
+__version__ = '0.2.5'
 
 
 # Plot types
@@ -72,6 +72,9 @@ class PlotlyWrapper():
         """
 
         load_settings(self, settings_file)
+        if self.plot_inline:
+            import IPython
+            global IPython
 
 
     def line(self, x, y, **kwargs):
@@ -244,8 +247,16 @@ class PlotlyWrapper():
         Plot chart.
         """
 
-        po.plot(dict(data=self.data, layout=self.layout))
+        po.plot(
+            dict(data=self.data, layout=self.layout),
+            filename='temp-plot.html',
+            auto_open=not self.plot_inline,
+        )
         self.__init__()  # Remove previous plot and layout data
+
+        # Plotly's iplot often has issues, so this shows the plot inline instead
+        if self.plot_inline:
+            return IPython.display.HTML('temp-plot.html')
 
 
     def save(self, filename='', scale=5, footer_height=48):
