@@ -34,7 +34,7 @@ def _basic_bar_scatter(self, kwargs):
             data.update(
                 textposition = kwargs.get('textposition', 'auto'),
             )
-        elif kwargs['plot_type'] == 'bar':
+        elif kwargs['plot_type'] == 'line':
             data.update(
                 line = dict(
                     dash = kwargs.get('dash', 'solid'),
