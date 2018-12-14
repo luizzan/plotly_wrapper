@@ -5,7 +5,7 @@ import numpy as np
 def _add_footer(self, **kwargs):
 
     try:
-        if self.footer:
+        if self.footer and kwargs.get('footer', True):
             main_img = Image.open(kwargs['filename'])
             footer_img = Image.open(requests.get(self.footer, stream=True).raw)
 

@@ -44,17 +44,17 @@ def _layout_basic(self, **kwargs):
     if self.bg_image and kwargs.get('bg_image', False):
         self.layout.update(dict(
             images= [dict(
-                source= self.bg_image,
-                xref= kwargs.get('images_xref', 'paper'),
-                yref= kwargs.get('images_yref', 'paper'),
-                x= kwargs.get('images_x', 0.5),
-                y= kwargs.get('images_y', 0.5),
+                source = self.bg_image,
+                xref = kwargs.get('images_xref', 'paper'),
+                yref = kwargs.get('images_yref', 'paper'),
+                x = kwargs.get('images_x', 0.5),
+                y = kwargs.get('images_y', 0.5),
                 xanchor = kwargs.get('images_xanchor', 'center'),
                 yanchor = kwargs.get('images_yanchor', 'middle'),
                 sizex = kwargs.get('images_sizex', 1),
                 sizey = kwargs.get('images_sizey', 1),
-                sizing= kwargs.get('images_sizing', 'contain'),
-                opacity= kwargs.get('images_opacity', 0.2),
-                layer= kwargs.get('images_layer', 'below'),
+                sizing = kwargs.get('images_sizing', 'contain'),
+                opacity = kwargs.get('images_opacity', 0.2),
+                layer = kwargs.get('images_layer', 'below'),
             )],
     ))

@@ -12,7 +12,10 @@ def _basic_bar_scatter(self, kwargs):
     kwargs['names'] = kwargs.get('names', ['']*len(kwargs['x']))
     kwargs['text'] = kwargs.get('text', ['']*len(kwargs['x']))
     kwargs['colors'] = kwargs.get('colors', self.colors)
-    kwargs['bg_image'] = kwargs.get('bg_image', True)  # shows a provided background image
+
+    # Prioritize bg image over footer
+    kwargs['bg_image'] = kwargs.get('bg_image', not not self.bg_image)
+    kwargs['footer'] = kwargs.get('bg_image', not kwargs['bg_image'] and not not self.footer)
 
     for i, (x, y, text, name) in enumerate(zip(
                                                 kwargs['x'],
