@@ -1,4 +1,4 @@
-def _table(self, kwargs):
+def table(self, cells, kwargs):
 
 	# Prepare plot
 	if kwargs.get('header', []):
@@ -10,14 +10,14 @@ def _table(self, kwargs):
 		kwargs['header'] = ['']
 		kwargs['header_height'] = 0
 
-	if type(kwargs['cells'][0]) != list:
-		kwargs['cells'] = [kwargs['cells']]
+	if type(cells[0]) != list:
+		cells = [cells]
 	kwargs['cell_height'] = kwargs.get('cell_height', 20)
 
 	self.data.append(dict(
 		type = 'table',
 		header = dict(values=kwargs['header'], height=kwargs['header_height']),
-		cells = dict(values=kwargs['cells'], height=kwargs['cell_height']),
+		cells = dict(values=cells, height=kwargs['cell_height']),
 	))
 
 	kwargs['margin_t'] = kwargs.get('margin_t', 1)
@@ -25,12 +25,12 @@ def _table(self, kwargs):
 	kwargs['margin_l'] = kwargs.get('margin_l', 1)
 	kwargs['margin_r'] = kwargs.get('margin_r', 1)
 	kwargs['height'] = kwargs.get('height', None)
-	kwargs['width'] = kwargs.get('width', 200*len(kwargs['cells']))
+	kwargs['width'] = kwargs.get('width', 200*len(cells))
 	if not kwargs.get('height', None):
 		margins = kwargs['margin_t'] + kwargs['margin_b']
 		kwargs['height'] = margins + kwargs['header_height'] + \
-			kwargs['cell_height']*len(kwargs['cells'][0]) + 4
+			kwargs['cell_height']*len(cells[0]) + 4
 
 	self.layout.update(dict())
 
-	return kwargs
+	self.kwargs.update(kwargs)

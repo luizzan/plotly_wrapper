@@ -39,15 +39,14 @@ pyw = PlotlyWrapper()
 pyw.load_settings('path/to/json/file.json')
 
 pyw.line(
-    [
-        ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
-        ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
-    ],
-    [
-        [1.5, 4, 3, 6, 5, 8, 7],
-        [0.5, 3, 2, 5, 4, 7, 6],
-    ],
-    names = ['A', 'B'],
+    ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+    [1.5, 4, 3, 6, 5, 8, 7],
+    name = 'A',
+)
+pyw.line(
+    ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+    [0.5, 3, 2, 5, 4, 7, 6],
+    name = 'B',
 )
 pyw.plot()
 

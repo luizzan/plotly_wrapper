@@ -10,7 +10,7 @@ def rgb_from_cmap(cmap, value):
 	color = 'rgb{}'.format(color)
 	return color
 
-def _scattermapbox(self, location, values, kwargs):
+def scattermapbox(self, location, values, kwargs):
 
 	# Convert dataframe to dict
 	if type(values) == pd.DataFrame:
@@ -108,4 +108,4 @@ def _scattermapbox(self, location, values, kwargs):
 		),
 	))
 
-	return kwargs
+	self.kwargs.update(kwargs)

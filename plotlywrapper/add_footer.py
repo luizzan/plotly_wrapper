@@ -2,15 +2,15 @@ import requests
 from PIL import Image
 import numpy as np
 
-def _add_footer(self, **kwargs):
+def add_footer(self):
 
     try:
-        if self.footer and kwargs.get('footer', True):
-            main_img = Image.open(kwargs['filename'])
+        if self.footer and self.kwargs.get('footer', True):
+            main_img = Image.open(self.kwargs['filename'])
             footer_img = Image.open(requests.get(self.footer, stream=True).raw)
 
-            footer_height = kwargs['footer_height']
-            footer_height = footer_height*kwargs['scale']
+            footer_height = self.kwargs.get('footer_height', 40)
+            footer_height = footer_height*self.kwargs.get('scale', 5)
             footer_img = footer_img.resize((main_img.size[0], footer_height))
 
             if self.footer_left:
@@ -29,7 +29,7 @@ def _add_footer(self, **kwargs):
                     footer_img.paste(right, (pos,0))
 
             imgs = np.vstack([main_img, footer_img])
-            Image.fromarray(imgs).save(kwargs['filename'])
+            Image.fromarray(imgs).save(self.kwargs['filename'])
 
     except Exception as e:
         print(e)

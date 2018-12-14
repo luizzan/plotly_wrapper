@@ -1,9 +1,8 @@
 import networkx as nx
 
-def _network(self, kwargs):
+def network(self, data, kwargs):
 
     kwargs['colors'] = kwargs.get('colors', self.colors)
-    data = kwargs['data']
 
     G = nx.Graph()
     # Add nodes
@@ -62,6 +61,5 @@ def _network(self, kwargs):
     kwargs['x_zeroline'] = kwargs.get('x_zeroline', False)
     kwargs['y_zeroline'] = kwargs.get('y_zeroline', False)
     kwargs['showlegend'] = kwargs.get('showlegend', False)
-    #self.layout.update(dict())
 
-    return kwargs
+    self.kwargs.update(kwargs)

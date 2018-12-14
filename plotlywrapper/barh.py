@@ -1,9 +1,9 @@
-from ._basic_bar_scatter import _basic_bar_scatter
+from .basic_bar_scatter import basic_bar_scatter
 
-def _barh(self, kwargs):
+def barh(self, x, y, kwargs):
 
 	kwargs['plot_type'] = 'bar'
 	kwargs['orientation'] = kwargs.pop('orientation', 'h')
 	kwargs['y_autorange'] = kwargs.pop('y_autorange', 'reversed')
 
-	return _basic_bar_scatter(self, kwargs)
+	basic_bar_scatter(self, x, y, kwargs)

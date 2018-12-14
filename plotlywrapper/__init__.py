@@ -1,23 +1,19 @@
-import plotly.plotly as py
-import plotly.offline as po
-import plotly.graph_objs as go
-po.init_notebook_mode(connected=True)
-
-from ._add_footer import _add_footer
-from ._bar import _bar
-from ._barh import _barh
-from ._heatmap import _heatmap
-from ._layout_basic import _layout_basic
-from ._line import _line
-from ._network import _network
-from ._pie import _pie
-from ._scatter import _scatter
-from ._scattermapbox import _scattermapbox
-from ._table import _table
+from .bar import bar
+from .barh import barh
+from .heatmap import heatmap
+from .layout_basic import layout_basic
+from .line import line
+from .network import network
+from .pie import pie
+from .scatter import scatter
+from .scattermapbox import scattermapbox
+from .table import table
 from .load_settings import load_settings
+from .plot import plot
+from .save import save
 
 
-__version__ = '0.2.9'
+__version__ = '0.3.0'
 
 
 # Plot types
@@ -53,6 +49,11 @@ class PlotlyWrapper():
     def __init__(self):
         self.data = []
         self.layout = {}
+        self.kwargs = {}
+
+
+    def reset(self):
+        self.__init__()
 
 
     def load_settings(self, settings_file):
@@ -70,11 +71,8 @@ class PlotlyWrapper():
             "footer_right" : "https://raw.githubusercontent.com/luizzan/images/master/pyw_footer_right.png",
         }
         """
-
+        
         load_settings(self, settings_file)
-        if self.plot_inline:
-            import IPython
-            global IPython
 
 
     def line(self, x, y, **kwargs):
@@ -87,9 +85,8 @@ class PlotlyWrapper():
         - text
         """
 
-        kwargs['x'] = x
-        kwargs['y'] = y
-        self._all_plots(_line(self, kwargs))
+        line(self, x, y, kwargs)
+        self._all_plots()
 
 
     def scatter(self, x, y, **kwargs):
@@ -102,9 +99,8 @@ class PlotlyWrapper():
         - text
         """
 
-        kwargs['x'] = x
-        kwargs['y'] = y
-        self._all_plots(_scatter(self, kwargs))
+        scatter(self, x, y, kwargs)
+        self._all_plots()
 
 
     def bar(self, x, y, **kwargs):
@@ -120,9 +116,8 @@ class PlotlyWrapper():
         - bargroupgap
         """
 
-        kwargs['x'] = x
-        kwargs['y'] = y
-        self._all_plots(_bar(self, kwargs))
+        bar(self, x, y, kwargs)
+        self._all_plots()
 
 
     def barh(self, x, y, **kwargs):
@@ -138,9 +133,8 @@ class PlotlyWrapper():
         - bargroupgap
         """
 
-        kwargs['x'] = x
-        kwargs['y'] = y
-        self._all_plots(_barh(self, kwargs))
+        barh(self, x, y, kwargs)
+        self._all_plots()
 
 
     def pie(self, values, **kwargs):
@@ -155,8 +149,8 @@ class PlotlyWrapper():
         - sort
         """
 
-        kwargs['values'] = values
-        self._all_plots(_pie(self, kwargs))
+        pie(self, values, kwargs)
+        self._all_plots()
 
 
     def network(self, data, **kwargs):
@@ -168,8 +162,8 @@ class PlotlyWrapper():
         - edge_opacity
         """
 
-        kwargs['data'] = data
-        self._all_plots(_network(self, kwargs))
+        network(self, data, kwargs)
+        self._all_plots()
 
 
     def heatmap(self, x, y, z, **kwargs):
@@ -182,25 +176,22 @@ class PlotlyWrapper():
         - colorscale
         """
 
-        kwargs['x'] = x
-        kwargs['y'] = y
-        kwargs['z'] = z
-        self._all_plots(_heatmap(self, kwargs))
+        heatmap(self, x, y, z, kwargs)
+        self._all_plots()
 
 
-    def table(self, header, cells, **kwargs):
+    def table(self, cells, **kwargs):
         """
         Plot table.
         Parameters:
-        - header
         - cells
-        - header_height
+        - header
         - cell_height
+        - header_height
         """
 
-        kwargs['header'] = header
-        kwargs['cells'] = cells
-        self._all_plots(_table(self, kwargs))
+        table(self, cells, kwargs)
+        self._all_plots()
 
 
     def scattermapbox(self, location, values, **kwargs):
@@ -227,18 +218,20 @@ class PlotlyWrapper():
         - colorbar_ticksuffix
         - colorbar_dtick
         """
+        
+        scattermapbox(self, location, values, kwargs)
+        self._all_plots()
 
-        self._all_plots(_scattermapbox(self, location, values, kwargs))
 
-
-    def _all_plots(self, kwargs):
-        _layout_basic(self, **kwargs)
+    def _all_plots(self):
+        layout_basic(self)
 
 
     def layout(self, **kwargs):
         """
         Add parameters to layout.
         """
+
         self.layout.update(kwargs)
 
 
@@ -247,19 +240,10 @@ class PlotlyWrapper():
         Plot chart.
         """
 
-        po.plot(
-            dict(data=self.data, layout=self.layout),
-            filename='temp-plot.html',
-            auto_open=not self.plot_inline,
-        )
-        self.__init__()  # Remove previous plot and layout data
-
-        # Plotly's iplot often has issues, so this shows the plot inline instead
-        if self.plot_inline:
-            return IPython.display.HTML('temp-plot.html')
+        return plot(self)
 
 
-    def save(self, filename='', scale=5, footer_height=48):
+    def save(self, filename, **kwargs):
         """
         Save plot locally.
         Parameters:
@@ -268,16 +252,4 @@ class PlotlyWrapper():
         - footer_height
         """
 
-        try:
-            py.sign_in(self.username, self.api_key)
-            py.image.save_as(
-                dict(data=self.data, layout=self.layout),
-                filename=filename,
-                scale=scale,
-            )
-            _add_footer(self, filename=filename, scale=scale, footer_height=footer_height)
-        except Exception as e:
-            print(e)
-            print('\n\nImage export error. Check Plotly username and API key.')
-
-        self.__init__()  # Remove previous plot and layout data
+        save(self, filename, kwargs)
