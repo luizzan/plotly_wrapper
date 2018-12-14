@@ -12,6 +12,7 @@ def _basic_bar_scatter(self, kwargs):
     kwargs['names'] = kwargs.get('names', ['']*len(kwargs['x']))
     kwargs['text'] = kwargs.get('text', ['']*len(kwargs['x']))
     kwargs['colors'] = kwargs.get('colors', self.colors)
+    kwargs['bg_image'] = True  # shows a provided background image
 
     for i, (x, y, text, name) in enumerate(zip(
                                                 kwargs['x'],
