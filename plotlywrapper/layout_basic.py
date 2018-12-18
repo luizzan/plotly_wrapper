@@ -21,6 +21,8 @@ def layout_basic(self):
             showticklabels = self.kwargs.get('x_showticklabels', True),
             zeroline = self.kwargs.get('x_zeroline', True),
             type = self.kwargs.get('x_type', '-'),
+            linecolor = self.kwargs.get('x_linecolor', '#000000'),
+            linewidth = self.kwargs.get('x_linewidth', 0),
         ),
         yaxis = dict(
             title = self.kwargs.get('y_title', ''),
@@ -31,6 +33,8 @@ def layout_basic(self):
             showticklabels = self.kwargs.get('y_showticklabels', True),
             zeroline = self.kwargs.get('y_zeroline', True),
             type = self.kwargs.get('y_type', '-'),
+            linecolor = self.kwargs.get('y_linecolor', '#000000'),
+            linewidth = self.kwargs.get('y_linewidth', 0),
         ),
         showlegend = self.kwargs.get('showlegend', True),
         legend = dict(
